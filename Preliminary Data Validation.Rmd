@@ -1,0 +1,222 @@
+---
+title: "Preliminary Data Validation"
+author: "Michelle Veriah"
+date: "11/27/2019"
+output: html_document
+---
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+library(readr)
+library(readxl)
+
+setwd("/Users/MichelleVeriah/Downloads") #you know the drill :) 
+
+##Network Data Input: 
+RawData <-       read_csv("Clickhere2.csv") 
+TableauData <- read_excel("ThorlosB.xlsx")
+NetworkType <- "LS"
+ClientName <- "Thorlos"
+
+##Tableau Input: 
+ActionCost <- round(TableauData$Actioncost[1], digits=1)
+Actions <- round(TableauData$Actions[1], digits=0)
+Clicks <- round(TableauData$Clicks[1], digits=0)
+CTR <- TableauData$Clickthroughrate[1]
+CR <- TableauData$Conversionrate[1]
+Conversions <- round(TableauData$Conversions[1], digits=0)
+CPA <- TableauData$Costperaction[1]
+CPC <- TableauData$Costperclick[1]
+EPC <- TableauData$Earningsperhundredclicks[1]
+Impressions <- round(TableauData$Impressions[1], digits=0)
+Leads <- round(TableauData$Leads[1], digits=0)
+NetworkCost <- round(TableauData$Networkcost[1], digits=1)
+ROI <- TableauData$Returnofinvestment[1]
+Revenue <- round(TableauData$Revenue[1], digits=1) 
+TotalCost <- round(TableauData$Totalcost[1], digits=1)
+```
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+
+NetworkData <- function(typeofdata, typeofnetwork) {
+  if(NetworkType == "CJ") {
+    RawData$Impressions <- as.numeric(RawData$Impressions)
+    RawData$Clicks <- as.numeric(RawData$Clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$`Sale Amount (USD)`))
+    RawData$Orders <- as.numeric(RawData$Sales)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$`Publisher Commission (USD)`))
+    RawData$Leads <- as.numeric(RawData$Leads)
+    RawData$NetworkCost <- as.numeric(gsub("[$,]","",RawData$`CJ Fee (USD)`))
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  } else if (NetworkType == "SAS") {
+    RawData$Impressions <- 0
+    RawData$Clicks <- as.numeric(RawData$Clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$`NetSales`))
+    RawData$Orders <- as.numeric(RawData$NumberofSales)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$`Commissions`))
+    RawData$Leads <- as.numeric(RawData$NumbLeads)
+    RawData$NetworkCost <- as.numeric(gsub("[$,]","",RawData$`TransactionFees`))
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  } else if (NetworkType == "PJX") {
+    RawData$Impressions <- as.numeric(RawData$Impressions)
+    RawData$Clicks <- as.numeric(RawData$Clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$Revenue))
+    RawData$Orders <- as.numeric(RawData$`Trans. Count`)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$`Pub Comm.`))
+    RawData$Leads <- as.numeric(RawData$Leads)
+    RawData$NetworkCost <- as.numeric(gsub("[$,]","",RawData$`Site Comm.`))
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  else if (NetworkType == "LS") {
+    RawData$Impressions <- as.numeric(RawData$`# of Impressions`)
+    RawData$Clicks <- as.numeric(RawData$`# of Clicks`)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$Sales))
+    RawData$Orders <- as.numeric(RawData$`# of Orders`)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$`Total Commission`))
+    RawData$Leads <- 0
+    RawData$NetworkCost <- 0
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  else if (NetworkType == "IR") {
+    RawData$Impressions <- as.numeric(RawData$Impressions)
+    RawData$Clicks <- as.numeric(RawData$Clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$Revenue))
+    RawData$Orders <- as.numeric(RawData$Actions)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$`Total Cost`))
+    RawData$Leads <- 0
+    RawData$NetworkCost <- 0
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  } else if (NetworkType == "AWIN") {
+    RawData$Impressions <- as.numeric(RawData$impressions)
+    RawData$Clicks <- as.numeric(RawData$all_clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$total_value))
+    RawData$Orders <- as.numeric(RawData$total_no)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$total_comm))
+    RawData$Leads <- 0
+    RawData$NetworkCost <- 0
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  else if (NetworkType == "AVANT") {
+    RawData$Impressions <- as.numeric(RawData$`Ad Impressions`)
+    RawData$Clicks <- as.numeric(RawData$`Click Throughs`)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$Sales))
+    RawData$Orders <- as.numeric(RawData$`# of Sales`)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$Commissions))
+    RawData$Leads <- 0
+    RawData$NetworkCost <- as.numeric(gsub("[$,]","",RawData$`Network Commissions`))
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  else if (NetworkType == "LC") {
+    RawData$Impressions <- as.numeric(RawData$Impressions)
+    RawData$Clicks <- as.numeric(RawData$Clicks)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$Amount))
+    RawData$Orders <- as.numeric(RawData$Sales)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$Commissions))
+    RawData$Leads <- as.numeric(RawData$Leads)
+    RawData$NetworkCost <- as.numeric(gsub("[$,]","",RawData$LCFees))
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  else if (NetworkType == "CF") {
+    RawData$Impressions <- as.numeric(RawData$ImpressionsTotal)
+    RawData$Clicks <- as.numeric(RawData$ClicksTotal)
+    RawData$Revenue <- as.numeric(gsub("[$,]","",RawData$SaleValueTotal))
+    RawData$Orders <- as.numeric(RawData$ConversionsTotal)
+    RawData$ActionCost <- as.numeric(gsub("[$,]","",RawData$CommissionTotal))
+    RawData$Leads <- 0
+    RawData$NetworkCost <- 0
+    OurData <<- data.frame(RawData$Impressions, RawData$Clicks, RawData$Revenue, RawData$Orders, RawData$ActionCost, RawData$Leads, RawData$NetworkCost )
+    colnames(OurData) <<- c("Impressions", "Clicks", "Revenue", "Orders", "ActionCost", "Leads", "NetworkCost")
+  }
+  return(OurData)
+}
+``` 
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+MyData <- NetworkData(RawData, NetworkType)
+```
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+#Metrics for this Time Period 
+My_Impressions <- sum(MyData$Impressions)
+My_Clicks <- sum(MyData$Clicks)
+My_Revenue <- sum(MyData$Revenue)
+My_Leads <- sum(MyData$Leads)
+My_ActionCost <- sum(MyData$ActionCost)
+My_Actions <- sum(MyData$Orders)
+My_NetworkCost <- sum(MyData$NetworkCost)
+My_CTR <- sum(MyData$Clicks)/sum(MyData$Impressions)
+My_CR <- My_Actions/My_Clicks
+My_Conversions <- My_Actions
+My_CPA <- My_ActionCost
+My_CPC <- My_ActionCost/My_Clicks
+My_EPC <- 100*My_Revenue/My_Clicks
+My_TotalCost <- My_NetworkCost+My_ActionCost
+My_ROI <- (My_Revenue-My_TotalCost)/My_TotalCost
+```
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+#Round Numbers
+My_Revenue <- round(My_Revenue, digits=1)
+My_ActionCost <- round(My_ActionCost, digits=1)
+My_NetworkCost <- round(My_NetworkCost, digits=1)
+My_CTR <- round(My_CTR, digits=2)
+My_CR <- round(My_CR, digits=4)
+My_CPA <- round(My_CPA, digits=0)
+My_CPC <- round(My_CPC, digits=2)
+My_EPC <- round(My_EPC, digits=2)
+My_TotalCost <- round(My_TotalCost, digits=1)
+My_ROI <- round(My_ROI, digits=2)
+```
+
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+#Match Function 
+MatchFunction <- function(TabMetric, NetworkMetric) {
+  if(TabMetric == NetworkMetric) {
+    MyOutput <- ""
+  } else {
+    MyOutput <- paste("Tableau: ", TabMetric,"\nNetwork: ", NetworkMetric)
+  } 
+  return(MyOutput)
+}
+```
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+Match_ActionCost <- MatchFunction(ActionCost, My_ActionCost)
+Match_Actions <- MatchFunction(Actions, My_Actions)
+Match_Clicks <- MatchFunction(Clicks, My_Clicks)
+Match_CTR <- MatchFunction(CTR, My_CTR)
+Match_CR <- MatchFunction(CR, My_CR)
+Match_Conversions <- MatchFunction(Conversions, My_Conversions)
+Match_CPA <- MatchFunction(CPA, My_CPA)
+Match_CPC <- MatchFunction(CPC, My_CPC)
+Match_EPC <- MatchFunction(EPC, My_EPC)
+Match_Impressions <- MatchFunction(Impressions, My_Impressions)
+Match_Leads <- MatchFunction(Leads, My_Leads)
+Match_NetworkCost <- MatchFunction(NetworkCost, My_NetworkCost) #special case for LS, PJX 
+Match_ROI <- MatchFunction(ROI, My_ROI)
+Match_Revenue <- MatchFunction(Revenue, My_Revenue)
+Match_TotalCost <- MatchFunction(TotalCost, My_TotalCost) #special case for LS, PJX
+```
+
+
+```{r, echo=FALSE, results= 'hide', include=FALSE}
+a <- c("Client Name", "Network", "Action Cost","Actions","Clicks","CTR","CR","Conversions","CPA","CPC","EP100C","Impressions","Leads","Network Cost", "ROI","Revenue","Total Cost")
+b <- c(ClientName, NetworkType, Match_ActionCost, Match_Actions, Match_Clicks, Match_CTR, Match_CR, Match_Conversions, Match_CPA, Match_CPC, Match_EPC, Match_Impressions, Match_Leads, Match_NetworkCost, Match_ROI, Match_Revenue, Match_TotalCost) 
+OutputFile <- data.frame(a,b, row.names = NULL)
+OutputFinal <- as.data.frame(t(as.matrix(OutputFile)))
+``` 
+
+```{r}
+write.csv(OutputFinal, file="DataValidationCheck.csv", row.names=FALSE)
+```
+
+
+
